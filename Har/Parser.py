@@ -46,6 +46,6 @@ class Parser():
         """
         ret = []
         for r in restrictions:
-            ret.extend(find_entries(r))
-
-        return list(set(ret))
+            ret.extend(self.find_entries(r))
+        return ret
+        # return list(set(ret))

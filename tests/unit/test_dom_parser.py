@@ -16,3 +16,4 @@ def test_extract():
     assert type(matched['something'][0]) == lxml.etree._Element
     print(type(matched['something'][0]))
     print(matched)
+    print()
