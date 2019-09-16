@@ -87,4 +87,4 @@ def test_trp_forum_har():
         # print(cont.keys())
         # print(url)
         # print(etree.tostring(cont['comments'], pretty_print=True))
-    assert False
+    # assert False
