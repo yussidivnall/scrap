@@ -25,7 +25,27 @@ class Parser():
             ret[key] = matched
         return ret
 
+
+    def get_nesting(self,  node_xpath):
+        """ Return an ordered list of nodes matching xpath expression and their
+        respective nesting level
+
+        Arguments:
+            node_xpath: an xpath expression to find the comment containing tag
+        Returns: A list of node, node_depth pairs.
+        """
+        ret = []
+        nodes = self.root.xpath(node_xpath)
+        extracted = {'nodes': []}  # extracted other keys (author,text,nodes,etc)
+        for i in range(0, len(nodes)):
+            n = nodes[i]
+            d = self.node_depth(n)
+            ret.append( (n,d) )
+        return ret
+
+
     def nesting(self, node_list, expresisons):
+        #@DEPRECATED NOT WORKING
         """ Construct a discussion thread like object from
         nested html elements.
         Recuse over matched
