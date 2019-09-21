@@ -57,19 +57,37 @@ def test_trp_nesting():
         comments = dom_parser.get_nesting(comments_xpath)
 
     print("Page 0")
-    dom_parser = Dom.Parser(pages[0]['response']['content']['text'])
+    dom_parser = Dom.Parser(pages[2]['response']['content']['text'])
     # print(etree.tostring(page_0.root, pretty_print=True).decode())
     comments = dom_parser.get_nesting(comments_xpath)
     for c in comments:
         elem = c[0]
         depth = c[1]
-
-
+        node_parser = Dom.Parser(elem)
+        node_parser.root = elem
+        extract_template = {
+            # "author": "span[@class='commentdetails']/a[@class='']",
+            "author": "span[@class='commentdetails']/a[contains(@href,'https://www.forums.red/u/')]",
+            "score": "span[@class='commentdetails']/span[@class='scores']",
+            "time": "span[@class='commentdetails']/span[@class='timeposted']",
+            "text": "div[contains(@class,'commentbody')]/p",
+                # "comments": "//div[contains(@class,'commentbody')]//p//text()",
+        }
+        extracted = node_parser.extract(extract_template)
+        print(extracted)
+        print(extracted['time'][0].text)
+        if extracted['author']:
+            print(extracted['author'][0].text)
+            print(extracted['score'][0].text)
+            txt = [etree.tostring(p) for p in extracted['text']]
+            print(txt)
+        else:
+            print('deleted')
         print("===")
-        print(etree.tostring(c[0]))
-        txt = "".join(c[0].itertext())
-        comment_id = c[0].attrib["id"]
-        print(comment_id)
+        # print(etree.tostring(c[0]))
+        # txt = "".join(c[0].itertext())
+        # comment_id = c[0].attrib["id"]
+        # print(comment_id)
         # print(c[1], txt)
     # print(comments)
     # print(pages[0]['response']['content']['text'])

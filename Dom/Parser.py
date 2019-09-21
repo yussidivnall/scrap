@@ -4,9 +4,11 @@ from lxml import etree
 class Parser():
     """ Helpers for parsing DOM document """
 
+    # def __init__(self, dom_text):
     def __init__(self, dom_text):
-        self.dom_text = dom_text
-        self.root = etree.HTML(dom_text)
+        if type(dom_text) == str:
+            self.dom_text = dom_text
+            self.root = etree.HTML(dom_text)
         # self.root = etree.XML(dom_text)
 
     def extract(self, expressions):
