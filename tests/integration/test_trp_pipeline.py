@@ -56,7 +56,7 @@ def test_trp_nesting():
         dom_parser = Dom.Parser(txt)
         comments = dom_parser.get_nesting(comments_xpath)
 
-    print("Page 0")
+    print("Page")
     dom_parser = Dom.Parser(pages[2]['response']['content']['text'])
     # print(etree.tostring(page_0.root, pretty_print=True).decode())
     comments = dom_parser.get_nesting(comments_xpath)
@@ -91,4 +91,52 @@ def test_trp_nesting():
         # print(c[1], txt)
     # print(comments)
     # print(pages[0]['response']['content']['text'])
+    # assert False
+
+
+def print_comment(c):
+    """Helper to print a comment dict """
+    if not c['author']:
+        print("[Deleted]\n")
+        return
+    print("{}> {}, {}, {}".format(
+            c['nesting_level'],
+            c['author'][0].text,
+            c['score'][0].text,
+            c['time'][0].text
+        )
+    )
+    comment_text = " ".join(["".join(n.itertext()) for n in c['text']])
+    print(comment_text)
+    print()
+
+def test_trp_extract_nested():
+    har_parser = Har.Parser(TEST_CAPTURE_FILE)
+    # Restrict to story URLs E.G
+    # https://www.forums.red/p/TheRedPill/220590/spain_gender_laws_a_country_against_men_the_woman_decides_to
+    story_page_restriction = {
+        "url_regex": "^.*.\/p\/[a-zA-Z0-9_-]*/[0-9]*/[a-zA-Z0-9_-]*$"
+    }
+
+    # Container of comment node
+    comment_container_xpath = "//div[contains(@class,'therest')]"
+    extract_template = {
+        "author": "span[@class='commentdetails']/a[contains(@href,'https://www.forums.red/u/')]",
+        "score": "span[@class='commentdetails']/span[@class='scores']",
+        "time": "span[@class='commentdetails']/span[@class='timeposted']",
+        "text": "div[contains(@class,'commentbody')]/p",
+    }
+    pages = har_parser.find_entries(story_page_restriction)
+    for p in pages:
+        url = p['request']['url']
+        txt = p['response']['content']['text']
+        print(url)
+        print("==========================")
+        dom_parser = Dom.Parser(txt)
+        comments = dom_parser.extract_nested(
+            comment_container_xpath,
+            extract_template
+            )
+        for c in comments:
+            print_comment(c)
     assert False

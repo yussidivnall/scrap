@@ -5,10 +5,15 @@ class Parser():
     """ Helpers for parsing DOM document """
 
     # def __init__(self, dom_text):
-    def __init__(self, dom_text):
-        if type(dom_text) == str:
-            self.dom_text = dom_text
-            self.root = etree.HTML(dom_text)
+    def __init__(self, dom):
+        if type(dom) == str:
+            self.dom_text = dom
+            self.root = etree.HTML(dom)
+        elif type(dom) == etree._Element:
+            self.root=dom
+            self.dom_text = etree.tostring(dom)
+        else:
+            raise TypeError("Unknown DOM element type {}".format(type(dom_text)))
         # self.root = etree.XML(dom_text)
 
     def extract(self, expressions):
@@ -46,28 +51,40 @@ class Parser():
         return ret
 
 
-    def nesting(self, node_list, expresisons):
-        #@DEPRECATED NOT WORKING
-        """ Construct a discussion thread like object from
-        nested html elements.
-        Recuse over matched
-        Arguments:
-            node_list: a list of matched nodes (from previous recursion)
-            expressions: a dictionary with 'keys:xpath_expressions',
-            with one of the keys being "nodes": and an xpath to match nodes for
-            next recursion.
-        Returns:
-            a dictionary with populated keys as in 'expressions'. and one key
-            "nodes": containing a list of matching nodes, will iterate over
-            those with the next recursion
+    def extract_nested(self, container_xpath, expresisons):
+        """  extract from nested DOM elements
 
+        Arguments:
+            container_xpath: An xpath expression to match the nested DOM
+            elements, e.g. "//div[@class='comment_container']"
+
+            expressions: a dictionary with 'keys:xpath_expressions', to extract
+            data from each matching container_xpath. note that top level DOM nodes
+            contain their nested decendents.
+            e.g.
+                {
+                    "author": "div[@class='comment_author']",
+                    "text": "div[@class='comment_text']/p",
+                }
+        Returns:
+            an ordered list of dictionaries with populated data from
+            "expressions" and for each node nesting level
+            e.g. 
+            [
+             {"nesting_level":6, "author":[<Element>], "text":[<Element>,...]},
+             {"nesting_level":9, "author":[<Element>], "text":[<Element>,...]},
+             {"nesting_level":9, "author":[<Element>], "text":[<Element>]},
+             ...
+            ]
         """
-        ret = {}
-        for node in node_list:
-            for key in expresisons.keys():
-                xpath = expresisons[key]
-                ret[key] = node.xpath(xpath)
-        pass
+        ret = []
+        comment_nodes = self.get_nesting(container_xpath)
+        for node, depth in comment_nodes:
+            parser = Parser(node)
+            element = parser.extract(expresisons)
+            element['nesting_level'] = depth
+            ret.append(element)
+        return ret
 
     @staticmethod
     def node_depth(node):
