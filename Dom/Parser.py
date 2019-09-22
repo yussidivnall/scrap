@@ -1,4 +1,5 @@
 from lxml import etree
+from dicttoxml import dicttoxml
 
 
 class Parser():
@@ -12,6 +13,9 @@ class Parser():
         elif type(dom) == etree._Element:
             self.root=dom
             self.dom_text = etree.tostring(dom)
+        elif type(dom) == dict:
+            self.dom_text = str(dicttoxml(dom))
+            self.root = etree.HTML(self.dom_text)
         else:
             raise TypeError("Unknown DOM element type {}".format(type(dom_text)))
         # self.root = etree.XML(dom_text)
