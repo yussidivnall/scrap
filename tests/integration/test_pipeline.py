@@ -1,8 +1,7 @@
 from lxml.etree import XMLSyntaxError
 from lxml import etree
 import re
-import Har
-import Dom
+from car_scraper import Har, Dom
 
 TEST_CAPTURE_FILE = "./tests/test_data/forum.red.1.har"
 

@@ -1,4 +1,4 @@
-import Dom
+from car_scraper import Dom
 import lxml
 from lxml import etree
 
@@ -19,6 +19,20 @@ def test_extract():
     print(matched)
     print()
 
+
+def test_input_types():
+    DOM_TEXT='<html><body></body></html>'
+    JSON_TEXT='{"key":{"value1":2, "value2":"hi"}}'
+    DICT ={"key":{"value1":2, "value2":"hi"}}
+
+    guess = Dom.Parser.text_type(DOM_TEXT)
+    assert guess == "HTML"
+
+    guess = Dom.Parser.text_type(JSON_TEXT)
+    assert guess == "JSON"
+
+    guess = Dom.Parser.text_type("Some words")
+    assert guess == "OTHER"
 
 
 

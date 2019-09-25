@@ -1,8 +1,7 @@
 import json
 from lxml import etree
 from dicttoxml import dicttoxml
-import Har
-import Dom
+from car_scraper import Har, Dom
 TEST_CAPTURE_FILE = "./tests/test_data/youtube.com.1.har"
 
 def test_get_json_response_content():

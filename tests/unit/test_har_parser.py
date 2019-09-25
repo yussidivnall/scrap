@@ -1,6 +1,6 @@
 import json
 import re
-import Har
+from car_scraper import Har
 
 TEST_CAPTURE_FILE = "./tests/test_data/forum.red.1.har"
 

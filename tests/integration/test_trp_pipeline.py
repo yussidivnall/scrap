@@ -1,6 +1,5 @@
 from lxml import etree
-import Har
-import Dom
+from car_scraper import Har, Dom
 TEST_CAPTURE_FILE = "./tests/test_data/forum.red.1.har"
 
 def test_trp():

@@ -80,17 +80,28 @@ hierarchy).
 To extract data from the Dom, we use xpath expressions, and dictionaries
 mapping xpath expressions to keys.
 
-```python
+```html
+<div class="comment_container>
+    <div class="author"> Boaty McBoatface </div>
+    <div class="stats">
+        <div class="score">5 points</div>
+        <div class="time"> 5:50pm </div>
+    </div>
+    <div class="content">
+        This is the comment
+    </div>
+</div>
+```
 
+
+
+```python
+comment_container_xpath = "//div[contains(@class,'comment_container')]"
 extract_template = {
-    "comment_id": "commentrenderer/commentid[1]/text()",
-    "video_id": "commentrenderer/publishedtimetext//videoid[1]/text()",
-    "text": "commentrenderer/contenttext/runs//text()",
-    "author": "commentrenderer/authortext/simpletext/text()",
-    "votes": "commentrenderer/votecount/simpletext//text()",
-    "likes": "commentrenderer/likecount//text()",
-    "replies": "commentrenderer/replycount//text()",
-    "time": "commentrenderer/publishedtimetext[1]//text/text()",
+    "author": "div[@class, 'author']//text()",
+    "score": "div[@class='stats']/div[@class='score']//text()",
+    "time": "div[@class='stats']/div[@class='time']//text()",
+    "text": "div[contains(@class,'content')]//text()",
 }
 ```
 
@@ -107,8 +118,11 @@ for entry in entries:
     # If txt is already a DOM text (an HTML probably)
     dom_parser = Dom.Parser(txt)
 
+    # TODO fix this, you won't need to...
     # Or, if txt is of a JSON repsonse we load this to a dictionary first.
-    d = json.loads(txt)
-    dom_parser = Dom.Parser(d)
+    # d = json.loads(txt)
+    # dom_parser = Dom.Parser(d)
 ```
+
+
 TODO finish this... for now look at tests/integration/
