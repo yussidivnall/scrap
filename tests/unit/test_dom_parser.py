@@ -22,11 +22,15 @@ def test_extract():
 
 def test_input_types():
     DOM_TEXT='<html><body></body></html>'
+    XML_TEXT='<?xml version="1.0" encoding="utf-8" ?><timedtext format="3">'
     JSON_TEXT='{"key":{"value1":2, "value2":"hi"}}'
     DICT ={"key":{"value1":2, "value2":"hi"}}
 
     guess = Dom.Parser.text_type(DOM_TEXT)
     assert guess == "HTML"
+
+    guess = Dom.Parser.text_type(XML_TEXT)
+    assert guess == "XML"
 
     guess = Dom.Parser.text_type(JSON_TEXT)
     assert guess == "JSON"
@@ -115,3 +119,17 @@ def test_get_nesting():
     assert "I am very very very wrong " in nodes[0][0].text
     assert "you're right" in nodes[1][0].text
     assert len(nodes) == 7
+
+
+from lxml import etree # noqa
+def test_xml_with_encoding():
+    XML_TEXT='''<?xml version="1.0" encoding="utf-8" ?>
+    <timedtextformat="3">
+        <taggy>
+            <mctagface>
+                Hi
+            </mctagface>
+        </taggy>
+    </timedtextformat>'''
+    #p = Dom.Parser(XML_TEXT)
+    xml = etree.XML(XML_TEXT)

@@ -81,7 +81,7 @@ To extract data from the Dom, we use xpath expressions, and dictionaries
 mapping xpath expressions to keys.
 
 ```html
-<div class="comment_container>
+<div class="comment_container">
     <div class="author"> Boaty McBoatface </div>
     <div class="stats">
         <div class="score">5 points</div>

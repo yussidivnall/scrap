@@ -1,3 +1,4 @@
+import logging
 import json
 from json import JSONDecodeError
 from lxml import etree
@@ -20,13 +21,15 @@ class Parser():
         """
         guess = None
         if type(txt) == bytes:
-            txt == str(txt)
+            txt = str(txt)
         if txt.startswith('{'):
             return "JSON"
         if txt.startswith('['):
             return "JSON"
         if txt.startswith('<!DOCTYPE html'):
             return "HTML"
+        if txt.startswith('<?xml version="1.0"'):
+            return "XML"
         if '<html' in txt:
             return "HTML"
         return "OTHER"
@@ -36,11 +39,20 @@ class Parser():
         if type(dom) == str or type(dom) == bytes:
             TYPE = self.text_type(dom)
             if TYPE == "JSON":
-               dom = json.loads(dom)
+               dom_dict = json.loads(dom)
+               self.dom_text = str(dicttoxml(dom_dict))
+               self.root = etree.HTML(self.dom_text)
             elif TYPE == "HTML":
                 print("HTML INPUT")
                 self.dom_text = dom
-                self.root = etree.HTML(dom)
+                self.root = etree.HTML(str(dom))
+            elif TYPE == 'XML':
+                print("XML INPUT")
+                self.dom_text = dom
+                #self.root = etree.fromstring(dom)
+                #self.root = etree.XML(bytes(dom))
+                # self.root = etree.XML(dom)
+                self.root = etree.fromstring(dom)
             else:
                 raise RuntimeError("Unknown input: {}".format(dom[0:100]))
         elif type(dom) == etree._Element:
@@ -49,8 +61,12 @@ class Parser():
         elif type(dom) == dict:
             self.dom_text = str(dicttoxml(dom))
             self.root = etree.HTML(self.dom_text)
+        elif type(dom) == list:
+            logging.warning("Response content is a list")
+            self.dom_text = str(dicttoxml(dom))
+            self.root = etree.HTML(self.dom_text)
         else:
-            raise TypeError("Unknown DOM element type {}".format(type(dom_text)))
+            raise TypeError("Unknown DOM element type {}".format(type(dom)))
         # self.root = etree.XML(dom_text)
 
     def extract(self, expressions):
