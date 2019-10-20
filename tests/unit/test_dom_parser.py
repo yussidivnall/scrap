@@ -124,12 +124,14 @@ def test_get_nesting():
 from lxml import etree # noqa
 def test_xml_with_encoding():
     XML_TEXT='''<?xml version="1.0" encoding="utf-8" ?>
-    <timedtextformat="3">
+    <timedtextformat blah="3">
         <taggy>
             <mctagface>
                 Hi
             </mctagface>
         </taggy>
-    </timedtextformat>'''
-    #p = Dom.Parser(XML_TEXT)
-    xml = etree.XML(XML_TEXT)
+    </timedtextformat>
+    '''
+    xml = etree.XML(XML_TEXT.encode('utf-8'))
+    # This fails
+    # xml = etree.XML(XML_TEXT)
