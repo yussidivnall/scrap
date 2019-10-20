@@ -125,4 +125,83 @@ for entry in entries:
 ```
 
 
+## Parsing JSON
+_Stream parsing_: In order to parse large files, and potentially non-file data,
+parsing is implemented as streams. 
+Extracting mechanism is very similar to it's xpath counterpart (discussed
+above), but implementinted using jsonpath syntax instead of xpath.
+
+
+*Example*
+Given a json file in the form of a list of dictionaries, 
+```json
+[
+    { 'id':1, 'name':'john', 'text':'Hello world'},
+    { 'id':2, 'name':'john', 'text':'Goodbye world!'},
+    // ...
+]
+```
+
+We can iterate this by 
+
+``` python
+from car_scraper import Json
+
+parser = Json.Parser('path/to/file.json')
+with parser as p:
+    for item in p.items:
+        # Do something with entry
+```
+
+Note that usually, the data stream (the list) is in some nested node of the
+dictionary.
+
+``` json
+{
+    'company_name': 'Blahincorporate'
+    'revenue': -5,
+    employees:[
+        { 'id':1, 'name':'john', 'text':'Hello world'},
+        { 'id':2, 'name':'john', 'text':'Goodbye world!'},
+    ]
+}
+```
+In which case you could specify the root node as employes, by passing the
+prefix argument to Json.Parser using JSONPath syntax.
+
+
+``` python
+parser = Json.Parser('path/to/file.json','$.employees')
+with parser as p:
+    for item in p.items:
+        # Do something with entry
+```
+
+We can then extract the items to a dictionary by using a template
+```python
+template = {
+	'id': '$.id',
+	'text': '$.name',
+	'lang': '$.text',
+}
+with parser as p:
+    for item in p.items:
+        entry = p.extract(item, template)
+```
+
+We can also filter out entries by applying restrictions
+
+```python
+restriction = {
+	'name': 'john'
+}
+with parser as p:
+    for item in p.items:
+        entry = p.extract(item, template)
+		if p.restricted(entry):
+			continue
+```
+
+
+
 TODO finish this... for now look at tests/integration/
