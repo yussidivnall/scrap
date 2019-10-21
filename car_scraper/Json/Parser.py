@@ -8,31 +8,60 @@ import jsonpath_rw
 
 class Parser():
 
-    def __init__(self, json_file, prefix='item'):
+
+    def __init__(self, json_file, prefix='item', template=None, restrictions=[]):
         self.input_file = open(json_file, 'rb')
         self.prefix = prefix
-        self.items = None
+        self.items = None # Items in input list
+        self.entries = None # processed items (after template and restrictions)
+        self.template = template
+        self.restrictions=restrictions
 
-    def __iter__(self):
-        return self
+    # def __iter__(self):
+    #     return self
 
     def __enter__(self):
+        # Raw input item
         self.items = ijson.items(self.input_file, self.prefix)
+        # Processed (templated) and restricted entries
+        self.entries = self.entry_generator()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.input_file.close()
 
+    def entry_generator(self):
+        for item in ijson.items(self.input_file, self.prefix):
+            entry = self.extract(item, self.template)
+            if self.restricted(entry, self.restrictions):
+                continue
+            else:
+                yield entry
 
     @staticmethod
-    def restricted(entry, restriction):
+    def restricted(entry, restrictions):
+        """ Compare a flat dictionary(entry) to another(restrictions) or a list
+        of restrictions.
+        Return true if any of the entry's keys differ from it's counterpart in
+        restriction
+        """
+        # TODO consider using regexp comparison, and or some function
         # No restrictions at all
-        if not restriction:
+        if not restrictions:
             return False
-        # All keys match exactly
-        for k in restriction.keys():
-            if entry[k] != restriction[k]:
-                return True
+        if type(restrictions) == dict:
+            restrictions = [restrictions]
+        if type(restrictions) is not list:
+            raise TypeError(
+                "Restrictions must be a dictionary or a list of dictionaries"
+            )
+        # Iterate over all restrictions,
+        # If any one restriction applied, return True
+        for restriction in restrictions:
+            # All keys match exactly
+            for k in restriction.keys():
+                if entry[k] != restriction[k]:
+                    return True
         return False
 
     @staticmethod

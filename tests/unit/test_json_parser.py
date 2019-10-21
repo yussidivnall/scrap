@@ -2,7 +2,6 @@ from car_scraper import Json
 
 def test_stream():
     test_data = "./tests/test_data/nazi_tweets_sample.json"
-    
     entries_template = {
         'id': '$.id',
         'text': '$.full_text',
@@ -51,3 +50,29 @@ def test_class_streaming():
             else:
                 assert entry['lang'] == 'en'
                 print(entry)
+
+def test_iterating():
+    test_data = "./tests/test_data/nazi_tweets_sample.json"
+
+    jpath_template = {
+        'id': '$.id',
+        'text': '$.full_text',
+        'lang': '$.lang',
+    }
+
+    restriction = {
+        'lang':'en'
+    }
+    parser = Json.Parser(
+        test_data,
+        prefix='item',
+        template=jpath_template,
+        restrictions = [restriction]
+    )
+    with parser as p:
+        # for item in p.items:
+        for entry in p.entries:
+            print(entry)
+            assert entry['lang'] == 'en'
+    # assert False
+
