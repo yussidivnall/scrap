@@ -181,8 +181,8 @@ We can then extract the items to a dictionary by using a template
 ```python
 template = {
 	'id': '$.id',
-	'text': '$.name',
-	'lang': '$.text',
+	'text': '$.text',
+	'lang': '$.lang',
 }
 with parser as p:
     for item in p.items:
@@ -202,6 +202,29 @@ with parser as p:
 			continue
 ```
 
+As A shorthand for this we can instead pass the template and a list of
+restrictions to the Json.Parser() constructor, then iterate over it's
+instance's entries:
 
+```python
+template = {
+	'id': '$.id',
+	'text': '$.name',
+	'lang': '$.text',
+}
+restriction = {
+	'lang': 'en'
+}
+parser = Json.Parser(
+    "path/to/file.json",
+    prefix='item',
+    template=template,
+    restrictions = [restriction]
+)
+
+with parser as p:
+    for entry in p.entries:
+        # Do something with processed entry
+```
 
 TODO finish this... for now look at tests/integration/
