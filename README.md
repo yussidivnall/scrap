@@ -227,4 +227,26 @@ with parser as p:
         # Do something with processed entry
 ```
 
+Similarly, we can postprocess by mapping keys to some function
+
+```python
+def clean_text(text):
+    return text.lower()
+
+
+postprocess = {
+    'text': clean_text
+}
+
+parser = Json.Parser(
+    "path/to/file.json",
+    template=template,
+    postprocess_template= postprocess,
+)
+
+with parser as p:
+    for entry in p.entries:
+        # Do something with processed entry
+```
+
 TODO finish this... for now look at tests/integration/
