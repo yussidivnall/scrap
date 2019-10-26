@@ -8,14 +8,17 @@ import jsonpath_rw
 
 class Parser():
 
-
-    def __init__(self, json_file, prefix='item', template=None, restrictions=[]):
+    def __init__(self, json_file,
+                 prefix='item', template=None,
+                 restrictions=[], postprocess_template = None
+                 ):
         self.input_file = open(json_file, 'rb')
         self.prefix = prefix
         self.items = None # Items in input list
         self.entries = None # processed items (after template and restrictions)
         self.template = template
         self.restrictions=restrictions
+        self.postprocess_template = postprocess_template
 
     # def __iter__(self):
     #     return self
@@ -35,8 +38,26 @@ class Parser():
             entry = self.extract(item, self.template)
             if self.restricted(entry, self.restrictions):
                 continue
+            if self.postprocess_template:
+                entry = self.postprocess(entry, self.postprocess_template)
             else:
                 yield entry
+
+    @staticmethod
+    def postprocess(entry, postprocess_template):
+        """ postprocess the entry based on a dictionary of mapped functions
+        postprocess_template is a dictionary mapping a key to a function
+        to run on the entry's field with the same key
+
+        Arguments:
+            entry: An entry extracted from template
+            postprocess_template: a template of mapped functions
+        """
+        for key in postprocess_template.keys():
+            value = entry[key]
+            func = postprocess_template[key]
+            entry[key] = func(value)
+        return entry
 
     @staticmethod
     def restricted(entry, restrictions):
@@ -132,7 +153,9 @@ class Parser():
 
     @staticmethod
     def load_dataset(tweets_json,template, restrictions=None, deliminator = ", "):
-        """ Open the nazi tweets json and parse into a CSV
+        """ Open tweets json and parse into a CSV
+
+        This is to open the whole file, non-stream-like
 
         Apply a template to extract jsonpath expressions to keys
         Only take first element of returned matched list.
@@ -156,24 +179,5 @@ class Parser():
                     logging.error("Tweet: {}".format(t))
                     logging.error(ex)
             if not restricted(entry, restrictions):
-                print("------------------------------")
-                print("Getting {}".format(entry))
                 ret.append(entry)
         return ret
-            # pass
-            # tweet_id = str(e['id'])
-            # created = e['created_at']
-            # text = e['full_text']
-            # lang = e['lang']
-            # in_reply_to_status = str(e['in_reply_to_status_id'])
-            # user_id = str(e['user']['id'])
-            # screen_name = str(e['user']['screen_name'])
-            # timezone = e['user']['time_zone']
-            # location = e['user']['location']
-            # if not restrictions:
-            #     r = deliminator.join(
-            #         [tweet_id, created, text, lang,
-            #          in_reply_to_status, user_id,
-            #          screen_name,timezone,location])
-            #     print(r)
-        pass
