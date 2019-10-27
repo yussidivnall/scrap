@@ -131,6 +131,8 @@ parsing is implemented as streams.
 Extracting mechanism is very similar to it's xpath counterpart (discussed
 above), but implementinted using jsonpath syntax instead of xpath.
 
+The Json.Parser instance contains two generators, one for the original json
+_items_ and one for the extracted preprocessed _entries_.
 
 *Example*
 Given a json file in the form of a list of dictionaries, 
@@ -174,7 +176,7 @@ prefix argument to Json.Parser using JSONPath syntax.
 parser = Json.Parser('path/to/file.json','$.employees')
 with parser as p:
     for item in p.items:
-        # Do something with entry
+        # Do something with item
 ```
 
 We can then extract the items to a dictionary by using a template
@@ -205,6 +207,8 @@ with parser as p:
 As A shorthand for this we can instead pass the template and a list of
 restrictions to the Json.Parser() constructor, then iterate over it's
 instance's entries:
+
+
 
 ```python
 template = {
