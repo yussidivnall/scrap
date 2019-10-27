@@ -40,8 +40,7 @@ class Parser():
                 continue
             if self.postprocess_template:
                 entry = self.postprocess(entry, self.postprocess_template)
-            else:
-                yield entry
+            yield entry
 
     @staticmethod
     def postprocess(entry, postprocess_template):
