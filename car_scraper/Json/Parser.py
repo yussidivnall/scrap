@@ -64,6 +64,10 @@ class Parser():
         of restrictions.
         Return true if any of the entry's keys differ from it's counterpart in
         restriction
+
+        Arguments:
+            entry:
+            restrictions:
         """
         # TODO consider using regexp comparison, and or some function
         # No restrictions at all
