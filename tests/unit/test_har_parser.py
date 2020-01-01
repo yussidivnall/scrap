@@ -4,7 +4,6 @@ from car_scraper import Har
 
 TEST_CAPTURE_FILE = "./tests/test_data/forum.red.1.har"
 
-
 def test_find():
     parser = Har.Parser(TEST_CAPTURE_FILE)
     matched = parser.find_entries(

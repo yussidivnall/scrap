@@ -1,9 +1,8 @@
-
 import logging
 import csv
 import json
 import ijson
-import jsonpath_rw
+import jsonpath_rw_ext
 # from jsonpath_rw import jsonpath, parse
 
 class Parser():
@@ -41,6 +40,37 @@ class Parser():
             if self.postprocess_template:
                 entry = self.postprocess(entry, self.postprocess_template)
             yield entry
+
+    @staticmethod
+    def jsonpath_find(jpath, data):
+        """ A helper function to match a json_path against dictionary data
+        Returns the matched value if a single entry, or a list of matched
+        values if more then one
+
+        Arguments:
+            jpath: A string with a jsonpath expression conforming to
+                   jsonpath_rw_ext sytax)
+            data: The dictionary to search
+
+        Returns:
+            The matched value or a list of values
+        """
+        jpath_obj = jsonpath_rw_ext.parse(jpath)
+        match = jpath_obj.find(data)
+
+        # Only one matched, return value
+        if len(match) == 1:
+            return match[0].value
+        # Multiple matched, add value to list
+        elif len(match) > 1:
+            ret = []
+            for m in match:
+                ret.append(m.value)
+            return ret
+        else:
+            raise ValueError(
+                "JSON_Path expression {} not matched".format(jpath)
+                )
 
     @staticmethod
     def postprocess(entry, postprocess_template):
@@ -103,9 +133,7 @@ class Parser():
         ret = {}
         for k in template.keys():
             jpath = template[k]
-            jpath_obj = jsonpath_rw.parse(jpath)
-            match = jpath_obj.find(entry)
-            ret[k] = match[0].value
+            ret[k] = Parser.jsonpath_find(jpath, entry)
         return ret
 
     @staticmethod
@@ -144,9 +172,10 @@ class Parser():
             entry = {}
             for k in template.keys():
                 jpath = template[k]
-                jpath_obj = jsonpath_rw.parse(jpath)
-                match = jpath_obj.find(e)
-                entry[k] = match[0].value
+                # jpath_obj = jsonpath_rw_ext.parse(jpath)
+                # match = jpath_obj.find(e)
+                # entry[k] = match[0].value
+                entry[k] = Parser.jsonpath_find(jpath, e)
 
             if Parser.restricted(entry,restrictions):
                 continue
@@ -174,6 +203,7 @@ class Parser():
                 try:
                     # This returns a list of matches
                     match = path_expr.find(t)
+                    print(len(match))
                     # Take only first match!!!
                     entry[key] = match[0].value
                 except TypeError as te:

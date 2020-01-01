@@ -1,7 +1,7 @@
 import pytest
 from car_scraper import Json
 
-@pytest.mark.skip(reason="Takes too long in dev")
+# @pytest.mark.skip(reason="Takes too long in dev")
 def test_stream():
     test_data = "./tests/test_data/nazi_tweets_sample.json"
     entries_template = {
@@ -25,7 +25,7 @@ def test_stream():
     #     pass
     # assert False
 
-@pytest.mark.skip(reason="Takes too long in dev")
+# @pytest.mark.skip(reason="Takes too long in dev")
 def test_class_streaming():
     test_data = "./tests/test_data/nazi_tweets_sample.json"
 
@@ -54,7 +54,7 @@ def test_class_streaming():
                 assert entry['lang'] == 'en'
                 print(entry)
 
-@pytest.mark.skip(reason="Takes too long in dev")
+# @pytest.mark.skip(reason="Takes too long in dev")
 def test_iterating():
     test_data = "./tests/test_data/nazi_tweets_sample.json"
 
@@ -83,6 +83,7 @@ def test_iterating():
 import re
 
 def fix_text(txt):
+    """ Some postprocessing function """
     txt = txt.lower()
     # Remove all @mentions at start of tweets 
     txt = re.sub(r"^(@\w+\s+)+", "", txt)
@@ -91,6 +92,7 @@ def fix_text(txt):
     txt = re.sub(r"\s+"," ", txt)
     return txt
 
+# @pytest.mark.skip(reason="Takes too long in dev")
 def test_preprocess_function():
     test_data = "./tests/test_data/nazi_tweets_sample.json"
 
@@ -122,3 +124,61 @@ def test_preprocess_function():
             assert not txt.startswith("@")
             assert txt == txt.lower()
         # assert False
+
+# @pytest.mark.skip(reason="Takes too long in dev")
+def test_extract_returns_multiple_items():
+    data = {
+        'l':[
+            {'entry':{'id':1}},
+            {'entry':{'id':2}},
+            {'entry':{'id':3}},
+        ]
+    }
+    template = {
+        'm': '$.l[*]',
+    }
+    extracted = Json.Parser.extract(data, template)
+    print(extracted['m'])
+    print(len(extracted['m']))
+    assert len(extracted['m']) == 3
+
+import jsonpath_rw_ext as jp
+def test_jsonpath_rw_ext():
+    data = {
+        'l':[
+            {'entry':{'id':1}},
+            {'entry':{'id':2}},
+            {'entry':{'id':3}},
+        ]
+    }
+    jpath = "$..entry[*]"
+    m = jp.match(jpath, data)
+    for e in m:
+        print(e)
+        assert 'id' in e.keys()
+        assert e['id'] in [1,2,3]
+    # p = jp.parser.ExtentedJsonPathParser().parse(jpath).find(data)
+    # print(m)
+    # assert False
+
+
+def test_extract_jpath():
+    data = {
+        'l':[
+            {'entry':{'id':1}},
+            {'entry':{'id':2}},
+            {'entry':{'id':3}},
+        ]
+    }
+    jpath = "$..entry[*]"
+    extracted = Json.Parser.jsonpath_find(jpath, data)
+    print("Extracted:{}".format(extracted))
+    for e in extracted:
+        print("entry:{}".format(e))
+        print(type(e))
+    assert len(extracted) == 3
+
+    jpath = "$.l[2]"
+    extracted = Json.Parser.jsonpath_find(jpath, data)
+    print("Extracted:{}".format(extracted))
+    assert len(extracted) == 1
