@@ -119,6 +119,48 @@ class Parser():
         return False
 
     @staticmethod
+    def allowed(entry, allowed_template):
+        """ Returns True if all keys in allowed_template match to their
+        counterpart in entry.
+
+        Arguments:
+            entry: a dictionary mapping some keys to some to some values.
+               e.g entry = { 'name': 'John', 'age': 30 }
+            restriction: a dictionary mapping a subset of entry's keys to a
+            functions which return True or False
+                e.g. 
+                ```
+                def can_drink(age)
+                    if age > 18:
+                        return True
+                    else return false
+
+                allowed_template = {
+                    'age': can_drink
+                }
+                ```
+            returns:
+                True if all restrictions defined in allowed_template
+                valuate to True, False otherwise
+        """
+        allowed_keys = list(allowed_template.keys())
+        entry_keys = list(entry.keys())
+        # Ensures all keys are present in entry
+        if not set(allowed_keys) <= set(entry_keys):
+            raise ValueError(
+                "some keys in {} are missing from {}".format(
+                    allowed_keys,
+                    entry_keys
+                )
+            )
+        for k in allowed_keys:
+            func = allowed_template[k]
+            value = entry[k]
+            if not func(value):
+                return False
+        return True
+
+    @staticmethod
     def extract(entry, template):
         """ Extract a single json entry to a templated dictionary
 
@@ -150,7 +192,10 @@ class Parser():
 
     @staticmethod
     def load_stream(
-                stream,template,path='item',
+                stream,
+                template,
+                path='item',
+                allowed_template=None,
                 restrictions=None,
                 output_file=None
                 ):
@@ -172,11 +217,14 @@ class Parser():
             entry = {}
             for k in template.keys():
                 jpath = template[k]
-                # jpath_obj = jsonpath_rw_ext.parse(jpath)
-                # match = jpath_obj.find(e)
-                # entry[k] = match[0].value
-                entry[k] = Parser.jsonpath_find(jpath, e)
-
+                try:
+                    entry[k] = Parser.jsonpath_find(jpath, e)
+                except ValueError as verr:
+                    logging.warning("No value given for {}, setting to None".format(k))
+                    entry[k]=None
+            if allowed_template and not Parser.allowed(entry, allowed_template):
+                # allowed_template is defined but at least one value in entry is not allowed()
+                continue
             if Parser.restricted(entry,restrictions):
                 continue
             ret.append(entry)

@@ -1,4 +1,5 @@
 import pytest
+import re
 from car_scraper import Json
 
 # @pytest.mark.skip(reason="Takes too long in dev")
@@ -20,7 +21,9 @@ def test_stream():
             path='item',
             restrictions = restrictions
             )
-        print(res)
+        for e in res:
+            print(e)
+        # print(res)
     #     print(fp)
     #     pass
     # assert False
@@ -182,3 +185,79 @@ def test_extract_jpath():
     extracted = Json.Parser.jsonpath_find(jpath, data)
     print("Extracted:{}".format(extracted))
     assert len(extracted) == 1
+
+
+def test_allowed():
+
+    def is_old(age):
+        if age > 49:
+            return True
+        return False
+
+    def is_mouthy(txt):
+        if 'Fucking' in txt:
+            return True
+        return False
+
+    entry = {
+        'name': 'John',
+        'text': 'Fucking hell this is terrible',
+        'age': 50,
+    }
+
+    allowed_template = {
+        'age': is_old,
+        'text': is_mouthy
+    }
+    assert Json.Parser.allowed(entry, allowed_template)
+
+    entry = {
+        'name': 'John',
+        'text': 'Bloody hell this is terrible',
+        'age': 49,
+    }
+    assert not Json.Parser.allowed(entry, allowed_template)
+    with pytest.raises(ValueError) as verr:
+        allowed_template = {
+            'agei': is_old,
+            'text': is_mouthy
+        }
+        Json.Parser.allowed(entry, allowed_template)
+
+
+def test_stream_allowed():
+    import re
+    har_file = "tests/test_data/forum.red.1.har"
+
+
+    def selected_endpoints(url):
+        url_regexps = [
+            '^.*.forums\.red\/i\/.*'
+        ]
+        for reg in url_regexps:
+            if re.match(reg, url):
+                return True
+        return False
+
+
+    entries_template={
+        'url': '$.request.url',
+        'text': '$.response.content.text',
+    }
+    allowed = {
+        'url': selected_endpoints,
+    }
+
+
+    with open(har_file, "rb") as fp:
+        res = Json.Parser.load_stream(
+            fp,
+            entries_template,
+            allowed_template = allowed,
+            path='log.entries.item',
+            # restrictions = restrictions
+            )
+        print(res)
+        for e in res:
+            assert 'https://www.forums.red/i' in e['url']
+            print(e['url'])

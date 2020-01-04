@@ -253,4 +253,54 @@ with parser as p:
         # Do something with processed entry
 ```
 
+We can use the allowed\_template to match the entry template against a
+validation method function in the same way. The validation method must return a
+True or False.
+
+
+Suppose we have some *data.json* file
+```json
+
+    'people':[
+        {'name': 'John', 'age':21},
+        {'name': 'jim', 'age' :25},
+        ...
+    ]
+```
+
+We could stream this file, and match it's values against some True/False
+function which we could iterate over using a generator pattern. 
+
+e.g.
+
+```python
+
+def is_john(name):
+    if 'john' in name.lower():
+        return True
+    return False
+
+template = {
+    'first_name':'$.name',
+    'age':'$.age',
+}
+
+allowed = {
+    'first_name':is_john
+}
+...
+with open("data.json", "rb") as fp:
+    res = Json.Parser.load_stream(
+        fp,
+        template,
+        allowed_template = allowed,
+        path='people.item',
+        )
+    for e in res:
+        print e['first_name']
+
+>>> John
+```
+
+
 TODO finish this... for now look at tests/integration/
