@@ -52,7 +52,7 @@ restriction = {
 ```
 
 url\_regexp defines some regular expression to match against the url.
-the other keys are not yet implemented. might not be useful.
+**the other keys are not yet implemented. might not be useful.**
 
 
 ``` python
@@ -66,14 +66,14 @@ will return true if regexp match `har_entry['request']['url']`.
 entries = har_parser.find_entries(restriction)
 ```
 
-You can also ```filter_any(restrictions)``` or ```filter_out(restrictions)```,
+You can also `filter_any(restrictions)` or `filter_out(restrictions)`,
 where restrictions is a list of restrictions.
 
 use these to select the requests which contain the data you wish to extract.
 Once you isolated the interesting requests (probably using firefox's packet
 inspector), filter the requests to the data source api endpoints.
 
-Then use the *DOM Parser* to extract the relevant bits of information using
+Then use the **DOM Parser** to extract the relevant bits of information using
 xpath expressions, templates and nested templates (usually forum comment
 hierarchy).
 
@@ -134,7 +134,7 @@ above), but implementinted using jsonpath syntax instead of xpath.
 The Json.Parser instance contains two generators, one for the original json
 _items_ and one for the extracted preprocessed _entries_.
 
-*Example*
+**Example**
 Given a json file in the form of a list of dictionaries, 
 ```json
 [
@@ -168,7 +168,7 @@ dictionary.
     ]
 }
 ```
-In which case you could specify the root node as employes, by passing the
+In which case you could specify the root node as "employees", by passing the
 prefix argument to Json.Parser using JSONPath syntax.
 
 

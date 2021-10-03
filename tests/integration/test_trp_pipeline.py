@@ -2,12 +2,13 @@ from lxml import etree
 from car_scraper import Har, Dom
 TEST_CAPTURE_FILE = "./tests/test_data/forum.red.1.har"
 
+
 def test_trp():
     har_parser = Har.Parser(TEST_CAPTURE_FILE)
     # E.G
     # https://www.forums.red/p/TheRedPill/220590/spain_gender_laws_a_country_against_men_the_woman_decides_to
     story_page_restriction = {
-        "url_regex": "^.*.\/p\/[a-zA-Z0-9_-]*/[0-9]*/[a-zA-Z0-9_-]*$"
+        "url_regex": r"^.*.\/p\/[a-zA-Z0-9_-]*/[0-9]*/[a-zA-Z0-9_-]*$"
     }
     # https://www.forums.red/u://www.forums.red/u/
     user_page_base_url = "https://www.forums.red/u/"
@@ -32,18 +33,18 @@ def test_trp():
 
     # assert False
 
+
 def test_trp_nesting():
     har_parser = Har.Parser(TEST_CAPTURE_FILE)
     # E.G
     # https://www.forums.red/p/TheRedPill/220590/spain_gender_laws_a_country_against_men_the_woman_decides_to
     story_page_restriction = {
-        "url_regex": "^.*.\/p\/[a-zA-Z0-9_-]*/[0-9]*/[a-zA-Z0-9_-]*$"
+        "url_regex": r"^.*.\/p\/[a-zA-Z0-9_-]*/[0-9]*/[a-zA-Z0-9_-]*$"
     }
 
     # Container of comment node
     # comments_xpath="//div[contains(@class,'commentbody')]"
-    comments_xpath="//div[contains(@class,'therest')]"
-
+    comments_xpath = "//div[contains(@class,'therest')]"
 
     # https://www.forums.red/u
     user_page_base_url = "https://www.forums.red/u/"
@@ -70,7 +71,7 @@ def test_trp_nesting():
             "score": "span[@class='commentdetails']/span[@class='scores']",
             "time": "span[@class='commentdetails']/span[@class='timeposted']",
             "text": "div[contains(@class,'commentbody')]/p",
-                # "comments": "//div[contains(@class,'commentbody')]//p//text()",
+            # "comments": "//div[contains(@class,'commentbody')]//p//text()",
         }
         extracted = node_parser.extract(extract_template)
         print(extracted)
@@ -109,12 +110,13 @@ def print_comment(c):
     print(comment_text)
     print()
 
+
 def test_trp_extract_nested():
     har_parser = Har.Parser(TEST_CAPTURE_FILE)
     # Restrict to story URLs E.G
     # https://www.forums.red/p/TheRedPill/220590/spain_gender_laws_a_country_against_men_the_woman_decides_to
     story_page_restriction = {
-        "url_regex": "^.*.\/p\/[a-zA-Z0-9_-]*/[0-9]*/[a-zA-Z0-9_-]*$"
+        "url_regex": r"^.*.\/p\/[a-zA-Z0-9_-]*/[0-9]*/[a-zA-Z0-9_-]*$"
     }
 
     # Container of comment node

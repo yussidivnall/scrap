@@ -1,10 +1,9 @@
 import logging
 import json
-from json import JSONDecodeError
+# from json import JSONDecodeError
 from lxml import etree
-from lxml.etree import XMLSyntaxError
+# from lxml.etree import XMLSyntaxError
 from dicttoxml import dicttoxml
-
 
 
 class Parser():
@@ -16,11 +15,10 @@ class Parser():
         Try to guess if JSON, HTML, or other
         Argument:
             txt: Some text
-        Returns: 
-            "HTML", "JSON", "FILENAME" or "OTHER"
+        Returns:
+            "HTML", "JSON", "XML" or "OTHER"
         """
-        guess = None
-        if type(txt) == bytes:
+        if isinstance(txt, bytes):
             txt = str(txt)
         if txt.startswith('{'):
             return "JSON"
@@ -34,14 +32,13 @@ class Parser():
             return "HTML"
         return "OTHER"
 
-
     def __init__(self, dom):
-        if type(dom) == str or type(dom) == bytes:
+        if isinstance(dom, str) or isinstance(dom, bytes):
             TYPE = self.text_type(dom)
             if TYPE == "JSON":
-               dom_dict = json.loads(dom)
-               self.dom_text = str(dicttoxml(dom_dict))
-               self.root = etree.HTML(self.dom_text)
+                dom_dict = json.loads(dom)
+                self.dom_text = str(dicttoxml(dom_dict))
+                self.root = etree.HTML(self.dom_text)
             elif TYPE == "HTML":
                 print("HTML INPUT")
                 self.dom_text = dom
@@ -49,19 +46,16 @@ class Parser():
             elif TYPE == 'XML':
                 print("XML INPUT")
                 self.dom_text = dom
-                #self.root = etree.fromstring(dom)
-                #self.root = etree.XML(bytes(dom))
-                # self.root = etree.XML(dom)
                 self.root = etree.fromstring(dom)
             else:
                 raise RuntimeError("Unknown input: {}".format(dom[0:100]))
-        elif type(dom) == etree._Element:
-            self.root=dom
+        elif isinstance(dom, etree._Element):
+            self.root = dom
             self.dom_text = etree.tostring(dom)
-        elif type(dom) == dict:
+        elif isinstance(dom, dict):
             self.dom_text = str(dicttoxml(dom))
             self.root = etree.HTML(self.dom_text)
-        elif type(dom) == list:
+        elif isinstance(dom, list):
             logging.warning("Response content is a list")
             self.dom_text = str(dicttoxml(dom))
             self.root = etree.HTML(self.dom_text)
@@ -85,7 +79,6 @@ class Parser():
             ret[key] = matched
         return ret
 
-
     def get_nesting(self,  node_xpath):
         """ Return an ordered list of nodes matching xpath expression and their
         respective nesting level
@@ -96,13 +89,13 @@ class Parser():
         """
         ret = []
         nodes = self.root.xpath(node_xpath)
-        extracted = {'nodes': []}  # extracted other keys (author,text,nodes,etc)
+        # extracted other keys (author,text,nodes,etc)
+        # extracted = {'nodes': []}
         for i in range(0, len(nodes)):
             n = nodes[i]
             d = self.node_depth(n)
-            ret.append( (n,d) )
+            ret.append((n, d))
         return ret
-
 
     def extract_nested(self, container_xpath, expresisons):
         """  extract from nested DOM elements
@@ -112,8 +105,8 @@ class Parser():
             elements, e.g. "//div[@class='comment_container']"
 
             expressions: a dictionary with 'keys:xpath_expressions', to extract
-            data from each matching container_xpath. note that top level DOM nodes
-            contain their nested decendents.
+            data from each matching container_xpath. note that top level DOM
+            nodes contain their nested decendents.
             e.g.
                 {
                     "author": "div[@class='comment_author']",
@@ -122,7 +115,7 @@ class Parser():
         Returns:
             an ordered list of dictionaries with populated data from
             "expressions" and for each node nesting level
-            e.g. 
+            e.g.
             [
              {"nesting_level":6, "author":[<Element>], "text":[<Element>,...]},
              {"nesting_level":9, "author":[<Element>], "text":[<Element>,...]},

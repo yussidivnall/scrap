@@ -26,7 +26,7 @@ class Restriction():
         self.restriction = restriction
 
     def match_entry(self, entry):
-        """ Returns True if all (not None) har entry 
+        """ Returns True if all (not None) har entry
         restrictions are fulfiled
         Currently only url_regex is tested
 

@@ -1,1 +1,1 @@
-from car_scraper.Json.Parser import Parser
+from car_scraper.Json.Parser import Parser  # noqa

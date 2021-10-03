@@ -1,22 +1,23 @@
 import logging
-import csv
 import json
 import ijson
 import jsonpath_rw_ext
 # from jsonpath_rw import jsonpath, parse
 
+
 class Parser():
 
     def __init__(self, json_file,
                  prefix='item', template=None,
-                 restrictions=[], postprocess_template = None
+                 restrictions=[], postprocess_template=None
                  ):
         self.input_file = open(json_file, 'rb')
         self.prefix = prefix
-        self.items = None # Items in input list
-        self.entries = None # processed items (after template and restrictions)
+        self.items = None  # Items in input list
+        # processed items (after template and restrictions)
+        self.entries = None
         self.template = template
-        self.restrictions=restrictions
+        self.restrictions = restrictions
         self.postprocess_template = postprocess_template
 
     # def __iter__(self):
@@ -103,9 +104,9 @@ class Parser():
         # No restrictions at all
         if not restrictions:
             return False
-        if type(restrictions) == dict:
+        if isinstance(restrictions, dict):
             restrictions = [restrictions]
-        if type(restrictions) is not list:
+        if not isinstance(restrictions, list):
             raise TypeError(
                 "Restrictions must be a dictionary or a list of dictionaries"
             )
@@ -128,7 +129,7 @@ class Parser():
                e.g entry = { 'name': 'John', 'age': 30 }
             restriction: a dictionary mapping a subset of entry's keys to a
             functions which return True or False
-                e.g. 
+                e.g.
                 ```
                 def can_drink(age)
                     if age > 18:
@@ -166,7 +167,7 @@ class Parser():
 
         Arguments:
             entry:  a single json item
-            template: a jsonpath template of the format: 
+            template: a jsonpath template of the format:
             {'key1':'jsonpath_expr1', 'key2': 'jsonpath_expr2', ...}
         Returns:
             A populated template. if nested templates, only return the root
@@ -179,16 +180,14 @@ class Parser():
         return ret
 
     @staticmethod
-    def dict_to_csv_entry(d, delim = ','):
+    def dict_to_csv_entry(d, delim=','):
         """ a flat dictionary to CSV entry """
         pass
         # keys = d.keys():
 
-
     @staticmethod
     def next_element(stream):
         pass
-
 
     @staticmethod
     def load_stream(
@@ -203,7 +202,7 @@ class Parser():
 
         Arguments:
             stream: a stream (probably a file descriptior from open() )
-            template: a dictionary of {key: jsonpath } 
+            template: a dictionary of {key: jsonpath }
                 e.g. {'author':'$.user.name', 'text': '$.full_text',...}
             path: the jsonpath of the list containing these templates
                 ('item' if stream is already this list )
@@ -220,19 +219,23 @@ class Parser():
                 try:
                     entry[k] = Parser.jsonpath_find(jpath, e)
                 except ValueError as verr:
-                    logging.warning("No value given for {}, setting to None".format(k))
-                    entry[k]=None
-            if allowed_template and not Parser.allowed(entry, allowed_template):
-                # allowed_template is defined but at least one value in entry is not allowed()
+                    logging.warning(
+                        "No value given for {}, setting to None".format(k))
+                    logging.debug(verr)
+                    entry[k] = None
+            if allowed_template and not Parser.allowed(
+                    entry, allowed_template):
+                # allowed_template is defined but at least one value in entry
+                # is not allowed()
                 continue
-            if Parser.restricted(entry,restrictions):
+            if Parser.restricted(entry, restrictions):
                 continue
             ret.append(entry)
         return ret
 
-
     @staticmethod
-    def load_dataset(tweets_json,template, restrictions=None, deliminator = ", "):
+    def load_dataset(tweets_json, template,
+                     restrictions=None, deliminator=", "):
         """ Open tweets json and parse into a CSV
 
         This is to open the whole file, non-stream-like
@@ -242,12 +245,12 @@ class Parser():
         (It's all we need in this dataset's case)
         """
         ret = []
-        with open(tweets_json,"r") as fp:
+        with open(tweets_json, "r") as fp:
             tweets = json.load(fp)
         for t in tweets:
             entry = {}
             for key in template.keys():
-                path_expr = parse(template[key])
+                path_expr = jsonpath_rw_ext.parse(template[key])
                 try:
                     # This returns a list of matches
                     match = path_expr.find(t)
@@ -259,6 +262,6 @@ class Parser():
                 except Exception as ex:
                     logging.error("Tweet: {}".format(t))
                     logging.error(ex)
-            if not restricted(entry, restrictions):
+            if not Parser.restricted(entry, restrictions):
                 ret.append(entry)
         return ret
