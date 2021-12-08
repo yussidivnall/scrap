@@ -1,6 +1,6 @@
 from setuptools import setup
 
-with open("requirements.txt","r") as fp:
+with open("requirements.txt", "r") as fp:
     requirements = fp.read().split()
 
 setup(name='carscraper',
@@ -10,7 +10,11 @@ setup(name='carscraper',
       author='Jim',
       author_email='jim@ctrlaltright.xyz',
       license='',
-      packages=['car_scraper',
-      'car_scraper.Har','car_scraper.Dom','car_scraper.Json'],
+      packages=[
+            'car_scraper',
+            'car_scraper.Har',
+            'car_scraper.Dom',
+            'car_scraper.Json'
+            ],
       install_requires=requirements,
       zip_safe=False)
