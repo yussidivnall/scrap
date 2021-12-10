@@ -72,4 +72,4 @@ def test_get_replies():
         replies = domp.extract_nested(
             comment_container_xpath, extract_template)
         print(replies)
-    assert False
+    # assert False

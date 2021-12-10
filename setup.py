@@ -11,10 +11,10 @@ setup(name='carscraper',
       author_email='jim@ctrlaltright.xyz',
       license='',
       packages=[
-            'car_scraper',
-            'car_scraper.Har',
-            'car_scraper.Dom',
-            'car_scraper.Json'
-            ],
+        'car_scraper',
+        'car_scraper.Har',
+        'car_scraper.Dom',
+        'car_scraper.Json'
+        ],
       install_requires=requirements,
       zip_safe=False)

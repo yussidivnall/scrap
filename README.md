@@ -41,6 +41,14 @@ some rules  against those to filter out requests/responses
 har_parser = Har.Parser("/path/to/harfile.json")
 ```
 
+OR 
+
+```python
+with open("/path/to/harfile.json") as fp:
+    har_parser = Har.Parser(har_file_contents=fp)
+```
+
+
 A rule, defined Har/Restriction.py is a set of common selectors
 ```python
 restriction = {
