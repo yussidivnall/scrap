@@ -5,25 +5,25 @@ import copy
 
 
 class Parser():
-    def __init__(self, har_file_name=None, har_file_contents=None):
+    def __init__(self, har_file_name=None, har_json=None):
         """ init parser
 
         Arguments:
             har_file_name:
                 initilise using a filename OR
-            har_file_contents:
+            har_json:
                 initilise using the contents of an already open HAR file
         """
         if har_file_name:
             with open(har_file_name, "r") as fp:
                 self.har_file = json.load(fp)
             self.entries = self.har_file['log']['entries']
-        elif har_file_contents:
-            self.har_file = json.load(har_file_contents)
+        elif har_json:
+            self.har_file = har_json
             self.entries = self.har_file['log']['entries']
         else:
             raise ValueError(
-                "Required at least a har_file_name or a har_file_contents"
+                "Required at least a har_file_name or a har_json"
                 )
 
     def find_entries(self, restriction):

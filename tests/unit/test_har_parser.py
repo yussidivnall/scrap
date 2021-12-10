@@ -1,13 +1,15 @@
+import json
 import re
 from car_scraper import Har
 
 TEST_CAPTURE_FILE = "./tests/test_data/forum.red.1.har"
 
 
-def test_open_har_file_type():
-    # Test opening as file instead a path string
+def test_open_har_json():
+    # Test opening as file contents JSON' instead a path string
     with open(TEST_CAPTURE_FILE) as fp:
-        parser = Har.Parser(har_file_contents=fp)
+        jsn = json.load(fp)
+        parser = Har.Parser(har_json=jsn)
         print(parser)
         assert type(parser) == Har.Parser
         matched = parser.find_entries(

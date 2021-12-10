@@ -44,8 +44,10 @@ har_parser = Har.Parser("/path/to/harfile.json")
 OR 
 
 ```python
+import json
 with open("/path/to/harfile.json") as fp:
-    har_parser = Har.Parser(har_file_contents=fp)
+    jsn = json.load(fp)
+    har_parser = Har.Parser(har_json = jsn)
 ```
 
 
