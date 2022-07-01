@@ -62,7 +62,7 @@ restriction = {
 ```
 
 url\_regexp defines some regular expression to match against the url.
-**the other keys are not yet implemented. might not be useful.**
+**The other keys are not yet implemented. might not be useful.**
 
 
 ``` python
@@ -148,8 +148,8 @@ _items_ and one for the extracted preprocessed _entries_.
 Given a json file in the form of a list of dictionaries, 
 ```json
 [
-    { 'id':1, 'name':'john', 'text':'Hello world'},
-    { 'id':2, 'name':'john', 'text':'Goodbye world!'},
+    { "id":1, "name":"john", "text":"Hello world"},
+    { "id":2, "name":"john", "text":"Goodbye world!"},
     // ...
 ]
 ```
@@ -170,11 +170,11 @@ dictionary.
 
 ``` json
 {
-    'company_name': 'Blahincorporate'
-    'revenue': -5,
-    employees:[
-        { 'id':1, 'name':'john', 'text':'Hello world'},
-        { 'id':2, 'name':'john', 'text':'Goodbye world!'},
+    "company_name": "Blahincorporate",
+    "revenue": -5,
+    "employees": [
+        { "id": 1, "name": "john", "text": "Hello world"},
+        { "id": 2, "name": "john", "text": "Goodbye world!"}
     ]
 }
 ```
@@ -271,9 +271,9 @@ True or False.
 Suppose we have some *data.json* file
 ```json
 
-    'people':[
-        {'name': 'John', 'age':21},
-        {'name': 'jim', 'age' :25},
+    "people":[
+        {"name": "John", "age":21},
+        {"name": "jim", "age" :25},
         ...
     ]
 ```
