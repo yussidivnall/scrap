@@ -196,7 +196,8 @@ class Parser():
                 path='item',
                 allowed_template=None,
                 restrictions=None,
-                output_file=None
+                output_file=None,
+                postprocess_template=None
                 ):
         """ Load and preprocess a stream
 
@@ -209,6 +210,7 @@ class Parser():
             restrictions: reject if key differs
             output: a path to a json or a csv file to output to
                 e.g. '/tmp/output.json' or '/tmp/output.csv'
+            postprocess_template: a template defining post processing
         """
         ret = []
         entries = ijson.items(stream, path)
@@ -230,6 +232,8 @@ class Parser():
                 continue
             if Parser.restricted(entry, restrictions):
                 continue
+            if postprocess_template:
+                entry = Parser.postprocess(entry, postprocess_template)
             ret.append(entry)
         return ret
 
