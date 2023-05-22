@@ -20,6 +20,7 @@ class Parser():
         self.restrictions = restrictions
         self.postprocess_template = postprocess_template
 
+
     # def __iter__(self):
     #     return self
 
@@ -197,6 +198,7 @@ class Parser():
                 allowed_template=None,
                 restrictions=None,
                 output_file=None,
+                preprocess_list=None,
                 postprocess_template=None
                 ):
         """ Load and preprocess a stream
@@ -205,6 +207,19 @@ class Parser():
             stream: a stream (probably a file descriptior from open() )
             template: a dictionary of {key: jsonpath }
                 e.g. {'author':'$.user.name', 'text': '$.full_text',...}
+            preprocess_list: a list of functions and optional arguments to run against the input element.
+                each function must at least take the input_entry  (and optionally args) and return a new input_entry or None.
+                When None is returned, the input row will be skipped,
+                otherwise the modified (preprocessed) element will be passed to the next preprocess function
+                e.g [
+                    {func: reject_unwanted_urls},
+                    {
+                        func: remove_unused_keys,
+                        args: {
+                            unused_keys: ["$.content_type", "$.*.uuid"]
+                        } },
+                    {func: unescape_json_string}
+                    ]
             path: the jsonpath of the list containing these templates
                 ('item' if stream is already this list )
             restrictions: reject if key differs
@@ -214,12 +229,26 @@ class Parser():
         """
         ret = []
         entries = ijson.items(stream, path)
-        for e in entries:
+        for input_entry in entries:
+
+            # Preporcess input and or reject entries
+            if preprocess_list is not None:
+                for preprocessor in preprocess_list:
+                    func = preprocessor['func']
+                    args = preprocessor.get('args', {})
+                    input_entry = func(input_entry, **args)
+                    if input_entry is None:
+                        # preprocessed entry is None, entry rejected
+                        # don't proceed to next preprocessor_function
+                        break
+                if input_entry is None:
+                    # Entry rejected, proceed to next element
+                    continue
             entry = {}
             for k in template.keys():
                 jpath = template[k]
                 try:
-                    entry[k] = Parser.jsonpath_find(jpath, e)
+                    entry[k] = Parser.jsonpath_find(jpath, input_entry)
                 except ValueError as verr:
                     logging.warning(
                         "No value given for {}, setting to None".format(k))
