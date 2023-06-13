@@ -35,3 +35,7 @@ def del_path(context, path: str):
 
     delete_by_path_list(context, path.split('.'))
 
+def dump(context):
+    print(json.dumps(entry, indent=2))
+    return entry
+
