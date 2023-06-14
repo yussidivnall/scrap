@@ -7,7 +7,7 @@ ijson==2.5.1
 importlib-metadata==0.22
 jsonpath-rw==1.4.0
 jsonpath-rw-ext==1.2.2
-lxml==4.4.1
+lxml==4.9.2
 more-itertools==7.2.0
 packaging==19.1
 pathlib2==2.3.4
